@@ -17,6 +17,7 @@ import classifier.views as V
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('inference', views.inference, name='inference'),
 ]
 
 K.set_session(_session)

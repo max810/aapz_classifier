@@ -24,7 +24,11 @@ SECRET_KEY = os.environ.get('DJANGO_AAPZ_CLASSIFIER_SK', "abc")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.31.62',
+    '127.0.0.1',
+    'localhost',
+]
 
 # Application definition
 

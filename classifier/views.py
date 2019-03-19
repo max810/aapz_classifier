@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 from django.views.decorators.http import require_POST
@@ -20,15 +21,20 @@ def index(request):
 
 
 @require_POST
+@csrf_exempt
 def inference(request: HttpRequest):
-    global _cnn
+    global CNN
     # with _graph.as_default():
     try:
-        pixels = np.frombuffer(request.body)
+        pixels = np.frombuffer(request.body, dtype='uint8')
         img = cv2.imdecode(pixels, cv2.IMREAD_COLOR)
-    except ValueError:
+        img = cv2.resize(img, (200, 150), interpolation=cv2.INTER_NEAREST)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # image = Image.fromarray(img)
+        img = img / 255.
+    except (ValueError, cv2.error):
         return HttpResponseBadRequest("Invalid image")
-    pred_vec = np.squeeze(_cnn.predict_on_batch(np.expand_dims(img, axis=0)))
+    pred_vec = np.squeeze(CNN.predict_on_batch(np.expand_dims(img, axis=0)))
     pred_class_idx = np.argmax(pred_vec)
 
     return HttpResponse(pred_class_idx)
